@@ -2,6 +2,7 @@ class FinanceManager {
     constructor() {
         this.data = { accounts: [], transactions: [] };
         this.autosave = false;
+        this.fileHandle = null;
         this.initEventListeners();
     }
 
@@ -14,8 +15,8 @@ class FinanceManager {
     }
 
     async loadFile() {
-        const fileHandle = await window.showOpenFilePicker();
-        const file = await fileHandle[0].getFile();
+        [this.fileHandle] = await window.showOpenFilePicker();
+        const file = await this.fileHandle.getFile();
         const content = await file.text();
         this.data = JSON.parse(content);
         this.renderAccounts();
@@ -23,8 +24,10 @@ class FinanceManager {
     }
 
     async saveFile() {
-        const fileHandle = await window.showSaveFilePicker();
-        const writable = await fileHandle.createWritable();
+        if (!this.fileHandle) {
+            [this.fileHandle] = await window.showSaveFilePicker();
+        }
+        const writable = await this.fileHandle.createWritable();
         await writable.write(JSON.stringify(this.data, null, 2));
         await writable.close();
         alert('Arquivo salvo com sucesso!');
