@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Finanças</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Gerenciador de Finanças</h1>
+    </header>
+    <main>
+        <section id="file-section">
+            <button id="load-file">Abrir Arquivo</button>
+            <button id="save-file">Salvar Alterações</button>
+            <label>
+                <input type="checkbox" id="autosave-toggle"> Autosave
+            </label>
+        </section>
+        <section id="account-section">
+            <h2>Contas</h2>
+            <form id="account-form">
+                <input type="text" id="account-name" placeholder="Nome da Conta" required>
+                <input type="number" id="account-balance" placeholder="Saldo Inicial" required>
+                <button type="submit">Adicionar Conta</button>
+            </form>
+            <ul id="account-list"></ul>
+        </section>
+        <section id="transaction-section">
+            <h2>Transações</h2>
+            <form id="transaction-form">
+                <select id="transaction-account" required></select>
+                <input type="text" id="transaction-description" placeholder="Descrição" required>
+                <input type="number" id="transaction-amount" placeholder="Valor" required>
+                <input type="date" id="transaction-date" required>
+                <button type="submit">Adicionar Transação</button>
+            </form>
+            <ul id="transaction-list"></ul>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

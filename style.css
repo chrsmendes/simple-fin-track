@@ -1,0 +1,47 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+header {
+    background: #007BFF;
+    color: #FFF;
+    text-align: center;
+    padding: 1em 0;
+}
+
+main {
+    padding: 1em;
+}
+
+section {
+    margin-bottom: 1.5em;
+}
+
+form {
+    margin-bottom: 1em;
+}
+
+input, button, select {
+    margin: 0.5em 0;
+    padding: 0.5em;
+    width: 100%;
+    max-width: 300px;
+}
+
+button {
+    cursor: pointer;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 0.5em 0;
+    border-bottom: 1px solid #CCC;
+    padding: 0.5em 0;
+}
