@@ -20,6 +20,7 @@ class FinanceManager {
 
     async openFile() {
         try {
+            this.showSpinner();
             const [fileHandle] = await window.showOpenFilePicker({
                 types: [{
                     description: 'JSON Files',
@@ -31,16 +32,20 @@ class FinanceManager {
             const file = await fileHandle.getFile();
             const contents = await file.text();
             this.data = JSON.parse(contents);
+            this.updateTotalBalance();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
             this.saveToLocalStorage();
         } catch (error) {
             console.error('Error opening file:', error);
+        } finally {
+            this.hideSpinner();
         }
     }
 
     async createFile() {
         try {
+            this.showSpinner();
             const handle = await window.showSaveFilePicker({
                 types: [{
                     description: 'JSON Files',
@@ -59,6 +64,8 @@ class FinanceManager {
             this.saveToLocalStorage();
         } catch (error) {
             console.error('Error creating file:', error);
+        } finally {
+            this.hideSpinner();
         }
     }
 
@@ -164,9 +171,10 @@ class FinanceManager {
             const description = dialog.querySelector('#transactionDescription').value;
             const amount = parseFloat(dialog.querySelector('#transactionAmount').value);
             const date = dialog.querySelector('#transactionDate').value;
-            const account = dialog.querySelector('#transactionAccount').value;
-            if (description && !isNaN(amount) && date && account) {
-                this.data.transactions.push({ description, amount, date, account });
+            const accountName = dialog.querySelector('#transactionAccount').value;
+            if (description && !isNaN(amount) && date && accountName) {
+                this.data.transactions.push({ description, amount, date, account: accountName });
+                this.updateAccountBalance(accountName, amount);
                 this.updateUI();
                 dialog.classList.remove('active');
                 this.saveToLocalStorage();
@@ -176,6 +184,31 @@ class FinanceManager {
         dialog.querySelector('.cancel-button').onclick = () => {
             dialog.classList.remove('active');
         };
+    }
+
+    updateAccountBalance(accountName, amount) {
+        const account = this.data.accounts.find(acc => acc.name === accountName);
+        if (account) {
+            account.balance += amount;
+        }
+    }
+
+    updateTotalBalance() {
+        this.data.accounts.forEach(account => {
+            account.balance = this.data.transactions
+                .filter(transaction => transaction.account === account.name)
+                .reduce((acc, transaction) => acc + transaction.amount, 0);
+        });
+    }
+
+    showSpinner() {
+        const spinner = document.getElementById('spinner');
+        spinner.classList.add('active');
+    }
+
+    hideSpinner() {
+        const spinner = document.getElementById('spinner');
+        spinner.classList.remove('active');
     }
 }
 
