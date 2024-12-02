@@ -1,26 +1,40 @@
 class FinanceManager {
     constructor() {
-        this.data = { accounts: [], transactions: [] };
-        this.autosave = false;
+        this.data = { name: '', color: '#007BFF', accounts: [], transactions: [] };
         this.fileHandle = null;
         this.initEventListeners();
+        this.updateColor();
     }
 
     initEventListeners() {
         document.getElementById('load-file').addEventListener('click', () => this.loadFile());
         document.getElementById('save-file').addEventListener('click', () => this.saveFile());
-        document.getElementById('autosave-toggle').addEventListener('change', (event) => this.toggleAutosave(event));
         document.getElementById('account-form').addEventListener('submit', (event) => this.addAccount(event));
         document.getElementById('transaction-form').addEventListener('submit', (event) => this.addTransaction(event));
+        document.getElementById('finance-name-input').addEventListener('input', (event) => this.updateFinanceName(event));
+        document.getElementById('color-picker').addEventListener('input', (event) => this.updateColor(event));
     }
 
     async loadFile() {
-        [this.fileHandle] = await window.showOpenFilePicker();
-        const file = await this.fileHandle.getFile();
-        const content = await file.text();
-        this.data = JSON.parse(content);
-        this.renderAccounts();
-        this.renderTransactions();
+        try {
+            [this.fileHandle] = await window.showOpenFilePicker();
+            const file = await this.fileHandle.getFile();
+            const content = await file.text();
+            console.log("File Content:", content); // Log the content for debugging
+            this.data = JSON.parse(content);
+            this.renderAccounts();
+            this.renderTransactions();
+            this.updateFinanceNameDisplay();
+            this.updateColor();
+        } catch (error) {
+            if (error instanceof SyntaxError && error.message.includes("Unexpected end of JSON input")) {
+                console.error("Error parsing JSON: Possibly incomplete file read or invalid JSON.", error);
+                alert("Error loading file: Invalid JSON or incomplete file read. Please check the file.");
+            } else {
+                console.error("Error loading file:", error);
+                alert("Error loading file: " + error.message);
+            }
+        }
     }
 
     async saveFile() {
@@ -33,14 +47,23 @@ class FinanceManager {
         alert('Arquivo salvo com sucesso!');
     }
 
-    toggleAutosave(event) {
-        this.autosave = event.target.checked;
+    updateFinanceName(event) {
+        this.data.name = event.target.value;
+        this.updateFinanceNameDisplay();
     }
 
-    async autosaveIfEnabled() {
-        if (this.autosave) {
-            await this.saveFile();
+    updateFinanceNameDisplay() {
+        document.getElementById('finance-name').textContent = this.data.name;
+    }
+
+    updateColor(event) {
+        if (event) {
+            this.data.color = event.target.value;
         }
+        document.documentElement.style.setProperty('--primary-color', this.data.color);
+        document.querySelectorAll('header, #file-section button').forEach(element => {
+            element.style.backgroundColor = this.data.color;
+        });
     }
 
     async addAccount(event) {
@@ -50,7 +73,6 @@ class FinanceManager {
         this.data.accounts.push({ name, balance });
         this.renderAccounts();
         document.getElementById('account-form').reset();
-        await this.autosaveIfEnabled();
     }
 
     async addTransaction(event) {
@@ -64,7 +86,6 @@ class FinanceManager {
         this.renderAccounts();
         this.renderTransactions();
         document.getElementById('transaction-form').reset();
-        await this.autosaveIfEnabled();
     }
 
     renderAccounts() {

@@ -9,14 +9,17 @@
 <body>
     <header>
         <h1>Gerenciador de Finanças</h1>
+        <div id="finance-name"></div>
     </header>
     <main>
         <section id="file-section">
-            <button id="load-file">Abrir Arquivo</button>
-            <button id="save-file">Salvar Alterações</button>
-            <label>
-                <input type="checkbox" id="autosave-toggle"> Autosave
-            </label>
+            <button id="load-file">📂</button>
+            <button id="save-file">💾</button>
+        </section>
+        <section id="settings-section">
+            <h2>Configurações</h2>
+            <input type="text" id="finance-name-input" placeholder="Nome da Finança">
+            <input type="color" id="color-picker" value="#007BFF">
         </section>
         <section id="account-section">
             <h2>Contas</h2>
