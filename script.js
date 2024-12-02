@@ -2,6 +2,7 @@ class FinanceManager {
     constructor() {
         this.data = { name: '', color: '#007BFF', accounts: [], transactions: [] };
         this.fileHandle = null;
+        this.autosave = false;
         this.initEventListeners();
         this.updateColor();
     }
@@ -13,6 +14,7 @@ class FinanceManager {
         document.getElementById('transaction-form').addEventListener('submit', (event) => this.addTransaction(event));
         document.getElementById('finance-name-input').addEventListener('input', (event) => this.updateFinanceName(event));
         document.getElementById('color-picker').addEventListener('input', (event) => this.updateColor(event));
+        document.getElementById('autosave-toggle').addEventListener('change', (event) => this.toggleAutosave(event));
     }
 
     async loadFile() {
@@ -20,20 +22,10 @@ class FinanceManager {
             [this.fileHandle] = await window.showOpenFilePicker();
             const file = await this.fileHandle.getFile();
             const content = await file.text();
-            console.log("File Content:", content); // Log the content for debugging
             this.data = JSON.parse(content);
-            this.renderAccounts();
-            this.renderTransactions();
-            this.updateFinanceNameDisplay();
-            this.updateColor();
+            this.render();
         } catch (error) {
-            if (error instanceof SyntaxError && error.message.includes("Unexpected end of JSON input")) {
-                console.error("Error parsing JSON: Possibly incomplete file read or invalid JSON.", error);
-                alert("Error loading file: Invalid JSON or incomplete file read. Please check the file.");
-            } else {
-                console.error("Error loading file:", error);
-                alert("Error loading file: " + error.message);
-            }
+            this.handleError(error);
         }
     }
 
@@ -47,9 +39,20 @@ class FinanceManager {
         alert('Arquivo salvo com sucesso!');
     }
 
+    toggleAutosave(event) {
+        this.autosave = event.target.checked;
+    }
+
+    async autosaveIfEnabled() {
+        if (this.autosave) {
+            await this.saveFile();
+        }
+    }
+
     updateFinanceName(event) {
         this.data.name = event.target.value;
         this.updateFinanceNameDisplay();
+        this.autosaveIfEnabled();
     }
 
     updateFinanceNameDisplay() {
@@ -64,6 +67,7 @@ class FinanceManager {
         document.querySelectorAll('header, #file-section button').forEach(element => {
             element.style.backgroundColor = this.data.color;
         });
+        this.autosaveIfEnabled();
     }
 
     async addAccount(event) {
@@ -73,6 +77,7 @@ class FinanceManager {
         this.data.accounts.push({ name, balance });
         this.renderAccounts();
         document.getElementById('account-form').reset();
+        this.autosaveIfEnabled();
     }
 
     async addTransaction(event) {
@@ -83,9 +88,16 @@ class FinanceManager {
         const date = document.getElementById('transaction-date').value;
         this.data.transactions.push({ accountIndex, description, amount, date });
         this.data.accounts[accountIndex].balance += amount;
+        this.render();
+        document.getElementById('transaction-form').reset();
+        this.autosaveIfEnabled();
+    }
+
+    render() {
         this.renderAccounts();
         this.renderTransactions();
-        document.getElementById('transaction-form').reset();
+        this.updateFinanceNameDisplay();
+        this.updateColor();
     }
 
     renderAccounts() {
@@ -112,6 +124,16 @@ class FinanceManager {
             li.textContent = `${transaction.date}: ${transaction.description} - Valor: R$${transaction.amount.toFixed(2)}`;
             transactionList.appendChild(li);
         });
+    }
+
+    handleError(error) {
+        if (error instanceof SyntaxError && error.message.includes("Unexpected end of JSON input")) {
+            console.error("Error parsing JSON: Possibly incomplete file read or invalid JSON.", error);
+            alert("Error loading file: Invalid JSON or incomplete file read. Please check the file.");
+        } else {
+            console.error("Error loading file:", error);
+            alert("Error loading file: " + error.message);
+        }
     }
 }
 
