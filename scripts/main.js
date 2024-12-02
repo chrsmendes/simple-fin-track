@@ -5,7 +5,7 @@ class FinanceManager {
             transactions: []
         };
         this.fileHandle = null;
-        // this.loadFromLocalStorage();
+        this.currentYearMonth = null;
         this.setupEventListeners();
     }
 
@@ -15,7 +15,7 @@ class FinanceManager {
         document.getElementById('saveFile').addEventListener('click', () => this.saveFile());
         document.getElementById('addAccount').addEventListener('click', () => this.showAddAccountDialog());
         document.getElementById('addTransaction').addEventListener('click', () => this.showAddTransactionDialog());
-        // window.addEventListener('beforeunload', () => this.saveToLocalStorage());
+        window.addEventListener('beforeunload', () => this.saveToLocalStorage());
     }
 
     async openFile() {
@@ -35,7 +35,7 @@ class FinanceManager {
             this.updateTotalBalance();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
-            // this.saveToLocalStorage();
+            this.saveToLocalStorage();
         } catch (error) {
             console.error('Error opening file:', error);
         } finally {
@@ -61,7 +61,7 @@ class FinanceManager {
             await this.saveFile();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
-            // this.saveToLocalStorage();
+            this.saveToLocalStorage();
         } catch (error) {
             console.error('Error creating file:', error);
         } finally {
@@ -81,24 +81,24 @@ class FinanceManager {
         }
     }
 
-    // saveToLocalStorage() {
-    //     localStorage.setItem('financeManagerData', JSON.stringify(this.data));
-    //     if (this.fileHandle) {
-    //         localStorage.setItem('financeManagerFileHandle', JSON.stringify(this.fileHandle));
-    //     }
-    // }
+    saveToLocalStorage() {
+        localStorage.setItem('financeManagerData', JSON.stringify(this.data));
+        if (this.fileHandle) {
+            localStorage.setItem('financeManagerFileHandle', JSON.stringify(this.fileHandle));
+        }
+    }
 
-    // loadFromLocalStorage() {
-    //     const data = localStorage.getItem('financeManagerData');
-    //     if (data) {
-    //         this.data = JSON.parse(data);
-    //     }
-    //     const fileHandle = localStorage.getItem('financeManagerFileHandle');
-    //     if (fileHandle) {
-    //         this.fileHandle = JSON.parse(fileHandle);
-    //     }
-    //     this.updateUI();
-    // }
+    loadFromLocalStorage() {
+        const data = localStorage.getItem('financeManagerData');
+        if (data) {
+            this.data = JSON.parse(data);
+        }
+        const fileHandle = localStorage.getItem('financeManagerFileHandle');
+        if (fileHandle) {
+            this.fileHandle = JSON.parse(fileHandle);
+        }
+        this.updateUI();
+    }
 
     updateUI() {
         // Update accounts UI
@@ -111,29 +111,87 @@ class FinanceManager {
         });
 
         // Update transactions UI
+        this.updateTransactionsUI();
+
+        // Update monthly summary UI
+        this.updateMonthlySummaryUI();
+    }
+
+    updateTransactionsUI() {
         const transactionList = document.querySelector('.transaction-list');
         transactionList.innerHTML = '';
-        this.data.transactions.forEach(transaction => {
+
+        if (!this.currentYearMonth) {
+            transactionList.textContent = 'Selecione um mês para visualizar as transações.';
+            return;
+        }
+
+        const transactions = this.data.transactions.filter(transaction => transaction.date.startsWith(this.currentYearMonth));
+        if (transactions.length === 0) {
+            transactionList.textContent = 'Nenhuma transação disponível para o mês selecionado.';
+            return;
+        }
+
+        transactions.forEach(transaction => {
             const transactionItem = document.createElement('div');
             transactionItem.textContent = `${transaction.date} - ${transaction.description}: R$${transaction.amount.toFixed(2)} (${transaction.account})`;
             transactionList.appendChild(transactionItem);
         });
+    }
 
-        // Update monthly summary UI
+    updateMonthlySummaryUI() {
         const monthlySummary = document.querySelector('.monthly-summary');
         monthlySummary.innerHTML = '';
+
         const transactionsByMonth = this.data.transactions.reduce((acc, transaction) => {
             const month = transaction.date.slice(0, 7);
-            if (!acc[month]) acc[month] = { income: 0, expense: 0 };
+            if (!acc[month]) acc[month] = { income: 0, expense: 0, transactions: [] };
             if (transaction.amount > 0) acc[month].income += transaction.amount;
             else acc[month].expense += transaction.amount;
+            acc[month].transactions.push(transaction);
             return acc;
         }, {});
-        for (const [month, summary] of Object.entries(transactionsByMonth)) {
-            const summaryItem = document.createElement('div');
-            summaryItem.textContent = `${month}: Receitas: R$${summary.income.toFixed(2)}, Despesas: R$${summary.expense.toFixed(2)}, Saldo: R$${(summary.income + summary.expense).toFixed(2)}`;
-            monthlySummary.appendChild(summaryItem);
+
+        const months = Object.keys(transactionsByMonth);
+        if (months.length === 0) {
+            monthlySummary.textContent = 'Nenhum dado disponível.';
+            return;
         }
+
+        const monthButtons = document.createElement('div');
+        monthButtons.classList.add('month-buttons');
+        months.forEach(month => {
+            const button = document.createElement('button');
+            button.textContent = month;
+            button.onclick = () => {
+                this.currentYearMonth = month;
+                this.updateTransactionsUI();
+                this.showMonthlyDetails(transactionsByMonth[month]);
+            };
+            monthButtons.appendChild(button);
+        });
+        monthlySummary.appendChild(monthButtons);
+
+        if (this.currentYearMonth) {
+            const summary = transactionsByMonth[this.currentYearMonth];
+            this.showMonthlyDetails(summary);
+        }
+    }
+
+    showMonthlyDetails(summary) {
+        const monthlySummary = document.querySelector('.monthly-summary');
+        const existingDetails = monthlySummary.querySelector('.summary-details');
+        if (existingDetails) {
+            monthlySummary.removeChild(existingDetails);
+        }
+        const summaryDetails = document.createElement('div');
+        summaryDetails.classList.add('summary-details');
+        summaryDetails.innerHTML = `
+            <p>Receitas: R$${summary.income.toFixed(2)}</p>
+            <p>Despesas: R$${summary.expense.toFixed(2)}</p>
+            <p>Saldo Final: R$${(summary.income + summary.expense).toFixed(2)}</p>
+        `;
+        monthlySummary.appendChild(summaryDetails);
     }
 
     showAddAccountDialog() {
@@ -146,7 +204,7 @@ class FinanceManager {
                 this.data.accounts.push({ name: accountName, balance: initialBalance });
                 this.updateUI();
                 dialog.classList.remove('active');
-                // this.saveToLocalStorage();
+                this.saveToLocalStorage();
                 this.saveFile();
             }
         };
@@ -177,7 +235,7 @@ class FinanceManager {
                 this.updateAccountBalance(accountName, amount);
                 this.updateUI();
                 dialog.classList.remove('active');
-                // this.saveToLocalStorage();
+                this.saveToLocalStorage();
                 this.saveFile();
             }
         };
