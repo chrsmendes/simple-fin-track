@@ -5,7 +5,7 @@ class FinanceManager {
             transactions: []
         };
         this.fileHandle = null;
-        this.loadFromLocalStorage();
+        // this.loadFromLocalStorage();
         this.setupEventListeners();
     }
 
@@ -15,7 +15,7 @@ class FinanceManager {
         document.getElementById('saveFile').addEventListener('click', () => this.saveFile());
         document.getElementById('addAccount').addEventListener('click', () => this.showAddAccountDialog());
         document.getElementById('addTransaction').addEventListener('click', () => this.showAddTransactionDialog());
-        window.addEventListener('beforeunload', () => this.saveToLocalStorage());
+        // window.addEventListener('beforeunload', () => this.saveToLocalStorage());
     }
 
     async openFile() {
@@ -35,7 +35,7 @@ class FinanceManager {
             this.updateTotalBalance();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
-            this.saveToLocalStorage();
+            // this.saveToLocalStorage();
         } catch (error) {
             console.error('Error opening file:', error);
         } finally {
@@ -61,7 +61,7 @@ class FinanceManager {
             await this.saveFile();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
-            this.saveToLocalStorage();
+            // this.saveToLocalStorage();
         } catch (error) {
             console.error('Error creating file:', error);
         } finally {
@@ -81,24 +81,24 @@ class FinanceManager {
         }
     }
 
-    saveToLocalStorage() {
-        localStorage.setItem('financeManagerData', JSON.stringify(this.data));
-        if (this.fileHandle) {
-            localStorage.setItem('financeManagerFileHandle', JSON.stringify(this.fileHandle));
-        }
-    }
+    // saveToLocalStorage() {
+    //     localStorage.setItem('financeManagerData', JSON.stringify(this.data));
+    //     if (this.fileHandle) {
+    //         localStorage.setItem('financeManagerFileHandle', JSON.stringify(this.fileHandle));
+    //     }
+    // }
 
-    loadFromLocalStorage() {
-        const data = localStorage.getItem('financeManagerData');
-        if (data) {
-            this.data = JSON.parse(data);
-        }
-        const fileHandle = localStorage.getItem('financeManagerFileHandle');
-        if (fileHandle) {
-            this.fileHandle = JSON.parse(fileHandle);
-        }
-        this.updateUI();
-    }
+    // loadFromLocalStorage() {
+    //     const data = localStorage.getItem('financeManagerData');
+    //     if (data) {
+    //         this.data = JSON.parse(data);
+    //     }
+    //     const fileHandle = localStorage.getItem('financeManagerFileHandle');
+    //     if (fileHandle) {
+    //         this.fileHandle = JSON.parse(fileHandle);
+    //     }
+    //     this.updateUI();
+    // }
 
     updateUI() {
         // Update accounts UI
@@ -146,7 +146,7 @@ class FinanceManager {
                 this.data.accounts.push({ name: accountName, balance: initialBalance });
                 this.updateUI();
                 dialog.classList.remove('active');
-                this.saveToLocalStorage();
+                // this.saveToLocalStorage();
                 this.saveFile();
             }
         };
@@ -177,7 +177,7 @@ class FinanceManager {
                 this.updateAccountBalance(accountName, amount);
                 this.updateUI();
                 dialog.classList.remove('active');
-                this.saveToLocalStorage();
+                // this.saveToLocalStorage();
                 this.saveFile();
             }
         };
