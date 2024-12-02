@@ -125,6 +125,15 @@ class FinanceManager {
 
     showAddTransactionDialog() {
         const dialog = document.getElementById('addTransactionDialog');
+        const accountSelect = dialog.querySelector('#transactionAccount');
+        accountSelect.innerHTML = ''; // Clear existing options
+        this.data.accounts.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.name;
+            option.textContent = account.name;
+            accountSelect.appendChild(option);
+        });
+
         dialog.classList.add('active');
         dialog.querySelector('.save-button').onclick = () => {
             const description = dialog.querySelector('#transactionDescription').value;
