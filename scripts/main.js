@@ -5,6 +5,7 @@ class FinanceManager {
             transactions: []
         };
         this.fileHandle = null;
+        this.loadFromLocalStorage();
         this.setupEventListeners();
     }
 
@@ -14,6 +15,7 @@ class FinanceManager {
         document.getElementById('saveFile').addEventListener('click', () => this.saveFile());
         document.getElementById('addAccount').addEventListener('click', () => this.showAddAccountDialog());
         document.getElementById('addTransaction').addEventListener('click', () => this.showAddTransactionDialog());
+        window.addEventListener('beforeunload', () => this.saveToLocalStorage());
     }
 
     async openFile() {
@@ -31,6 +33,7 @@ class FinanceManager {
             this.data = JSON.parse(contents);
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
+            this.saveToLocalStorage();
         } catch (error) {
             console.error('Error opening file:', error);
         }
@@ -53,6 +56,7 @@ class FinanceManager {
             await this.saveFile();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
+            this.saveToLocalStorage();
         } catch (error) {
             console.error('Error creating file:', error);
         }
@@ -68,6 +72,25 @@ class FinanceManager {
         } catch (error) {
             console.error('Error saving file:', error);
         }
+    }
+
+    saveToLocalStorage() {
+        localStorage.setItem('financeManagerData', JSON.stringify(this.data));
+        if (this.fileHandle) {
+            localStorage.setItem('financeManagerFileHandle', JSON.stringify(this.fileHandle));
+        }
+    }
+
+    loadFromLocalStorage() {
+        const data = localStorage.getItem('financeManagerData');
+        if (data) {
+            this.data = JSON.parse(data);
+        }
+        const fileHandle = localStorage.getItem('financeManagerFileHandle');
+        if (fileHandle) {
+            this.fileHandle = JSON.parse(fileHandle);
+        }
+        this.updateUI();
     }
 
     updateUI() {
@@ -116,6 +139,8 @@ class FinanceManager {
                 this.data.accounts.push({ name: accountName, balance: initialBalance });
                 this.updateUI();
                 dialog.classList.remove('active');
+                this.saveToLocalStorage();
+                this.saveFile();
             }
         };
         dialog.querySelector('.cancel-button').onclick = () => {
@@ -144,6 +169,8 @@ class FinanceManager {
                 this.data.transactions.push({ description, amount, date, account });
                 this.updateUI();
                 dialog.classList.remove('active');
+                this.saveToLocalStorage();
+                this.saveFile();
             }
         };
         dialog.querySelector('.cancel-button').onclick = () => {
