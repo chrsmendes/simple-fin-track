@@ -1,4 +1,3 @@
-
 class FinanceManager {
     constructor() {
         this.data = {
@@ -72,15 +71,75 @@ class FinanceManager {
     }
 
     updateUI() {
-        // TODO: Implement UI update logic
+        // Update accounts UI
+        const accountList = document.querySelector('.account-list');
+        accountList.innerHTML = '';
+        this.data.accounts.forEach(account => {
+            const accountItem = document.createElement('div');
+            accountItem.textContent = `${account.name}: R$${account.balance.toFixed(2)}`;
+            accountList.appendChild(accountItem);
+        });
+
+        // Update transactions UI
+        const transactionList = document.querySelector('.transaction-list');
+        transactionList.innerHTML = '';
+        this.data.transactions.forEach(transaction => {
+            const transactionItem = document.createElement('div');
+            transactionItem.textContent = `${transaction.date} - ${transaction.description}: R$${transaction.amount.toFixed(2)} (${transaction.account})`;
+            transactionList.appendChild(transactionItem);
+        });
+
+        // Update monthly summary UI
+        const monthlySummary = document.querySelector('.monthly-summary');
+        monthlySummary.innerHTML = '';
+        const transactionsByMonth = this.data.transactions.reduce((acc, transaction) => {
+            const month = transaction.date.slice(0, 7);
+            if (!acc[month]) acc[month] = { income: 0, expense: 0 };
+            if (transaction.amount > 0) acc[month].income += transaction.amount;
+            else acc[month].expense += transaction.amount;
+            return acc;
+        }, {});
+        for (const [month, summary] of Object.entries(transactionsByMonth)) {
+            const summaryItem = document.createElement('div');
+            summaryItem.textContent = `${month}: Receitas: R$${summary.income.toFixed(2)}, Despesas: R$${summary.expense.toFixed(2)}, Saldo: R$${(summary.income + summary.expense).toFixed(2)}`;
+            monthlySummary.appendChild(summaryItem);
+        }
     }
 
     showAddAccountDialog() {
-        // TODO: Implement add account dialog
+        const dialog = document.getElementById('addAccountDialog');
+        dialog.classList.add('active');
+        dialog.querySelector('.save-button').onclick = () => {
+            const accountName = dialog.querySelector('#accountName').value;
+            const initialBalance = parseFloat(dialog.querySelector('#initialBalance').value);
+            if (accountName && !isNaN(initialBalance)) {
+                this.data.accounts.push({ name: accountName, balance: initialBalance });
+                this.updateUI();
+                dialog.classList.remove('active');
+            }
+        };
+        dialog.querySelector('.cancel-button').onclick = () => {
+            dialog.classList.remove('active');
+        };
     }
 
     showAddTransactionDialog() {
-        // TODO: Implement add transaction dialog
+        const dialog = document.getElementById('addTransactionDialog');
+        dialog.classList.add('active');
+        dialog.querySelector('.save-button').onclick = () => {
+            const description = dialog.querySelector('#transactionDescription').value;
+            const amount = parseFloat(dialog.querySelector('#transactionAmount').value);
+            const date = dialog.querySelector('#transactionDate').value;
+            const account = dialog.querySelector('#transactionAccount').value;
+            if (description && !isNaN(amount) && date && account) {
+                this.data.transactions.push({ description, amount, date, account });
+                this.updateUI();
+                dialog.classList.remove('active');
+            }
+        };
+        dialog.querySelector('.cancel-button').onclick = () => {
+            dialog.classList.remove('active');
+        };
     }
 }
 

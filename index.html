@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -35,6 +34,46 @@
             <div class="monthly-summary"></div>
         </section>
     </main>
+
+    <div id="addAccountDialog" class="dialog">
+        <div class="dialog-header">
+            <h3>Nova Conta</h3>
+            <button class="cancel-button">X</button>
+        </div>
+        <div class="dialog-body">
+            <label for="accountName">Nome da Conta:</label>
+            <input type="text" id="accountName">
+            <label for="initialBalance">Saldo Inicial:</label>
+            <input type="number" id="initialBalance">
+        </div>
+        <div class="dialog-footer">
+            <button class="save-button">Salvar</button>
+            <button class="cancel-button">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="addTransactionDialog" class="dialog">
+        <div class="dialog-header">
+            <h3>Nova Transação</h3>
+            <button class="cancel-button">X</button>
+        </div>
+        <div class="dialog-body">
+            <label for="transactionDescription">Descrição:</label>
+            <input type="text" id="transactionDescription">
+            <label for="transactionAmount">Valor:</label>
+            <input type="number" id="transactionAmount">
+            <label for="transactionDate">Data:</label>
+            <input type="date" id="transactionDate">
+            <label for="transactionAccount">Conta:</label>
+            <select id="transactionAccount">
+                <!-- Options will be populated dynamically -->
+            </select>
+        </div>
+        <div class="dialog-footer">
+            <button class="save-button">Salvar</button>
+            <button class="cancel-button">Cancelar</button>
+        </div>
+    </div>
 
     <script type="module" src="scripts/main.js"></script>
 </body>
