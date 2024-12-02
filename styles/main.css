@@ -4,6 +4,8 @@
     --background-color: #f5f6fa;
     --text-color: #2c3e50;
     --border-color: #dcdde1;
+    --income-color: #2ecc71;
+    --expense-color: #e74c3c;
 }
 
 * {
@@ -160,4 +162,28 @@ main {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     background-color: var(--background-color);
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.transaction-item span {
+    flex-grow: 1;
+}
+
+.transaction-item button {
+    margin-left: 0.5rem;
+}
+
+.transaction-item.income {
+    color: var(--income-color);
+}
+
+.transaction-item.expense {
+    color: var(--expense-color);
 }

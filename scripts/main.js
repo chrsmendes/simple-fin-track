@@ -132,11 +132,60 @@ class FinanceManager {
             return;
         }
 
-        transactions.forEach(transaction => {
+        transactions.forEach((transaction, index) => {
             const transactionItem = document.createElement('div');
-            transactionItem.textContent = `${transaction.date} - ${transaction.description}: R$${transaction.amount.toFixed(2)} (${transaction.account})`;
+            transactionItem.classList.add('transaction-item');
+            transactionItem.innerHTML = `
+                <span>${transaction.date} - ${transaction.description}: R$${transaction.amount.toFixed(2)} (${transaction.account})</span>
+                <button class="edit-transaction" data-index="${index}">Editar</button>
+                <button class="delete-transaction" data-index="${index}">Remover</button>
+            `;
             transactionList.appendChild(transactionItem);
         });
+
+        transactionList.querySelectorAll('.edit-transaction').forEach(button => {
+            button.addEventListener('click', (e) => this.showEditTransactionDialog(e.target.dataset.index));
+        });
+
+        transactionList.querySelectorAll('.delete-transaction').forEach(button => {
+            button.addEventListener('click', (e) => this.removeTransaction(e.target.dataset.index));
+        });
+    }
+
+    showEditTransactionDialog(index) {
+        const transaction = this.data.transactions[index];
+        const dialog = document.getElementById('addTransactionDialog');
+        dialog.querySelector('#transactionDescription').value = transaction.description;
+        dialog.querySelector('#transactionAmount').value = transaction.amount;
+        dialog.querySelector('#transactionDate').value = transaction.date;
+        dialog.querySelector('#transactionAccount').value = transaction.account;
+        dialog.classList.add('active');
+        dialog.querySelector('.save-button').onclick = () => {
+            const description = dialog.querySelector('#transactionDescription').value;
+            const amount = parseFloat(dialog.querySelector('#transactionAmount').value);
+            const date = dialog.querySelector('#transactionDate').value;
+            const accountName = dialog.querySelector('#transactionAccount').value;
+            if (description && !isNaN(amount) && date && accountName) {
+                this.data.transactions[index] = { description, amount, date, account: accountName };
+                this.updateAccountBalance(accountName, amount);
+                this.updateUI();
+                dialog.classList.remove('active');
+                this.saveToLocalStorage();
+                this.saveFile();
+            }
+        };
+        dialog.querySelector('.cancel-button').onclick = () => {
+            dialog.classList.remove('active');
+        };
+    }
+
+    removeTransaction(index) {
+        const transaction = this.data.transactions[index];
+        this.data.transactions.splice(index, 1);
+        this.updateAccountBalance(transaction.account, -transaction.amount);
+        this.updateUI();
+        this.saveToLocalStorage();
+        this.saveFile();
     }
 
     updateMonthlySummaryUI() {
