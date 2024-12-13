@@ -9,9 +9,6 @@ class UIManager {
         document.getElementById('openFile').addEventListener('click', () => this.openFile());
         document.getElementById('createFile').addEventListener('click', () => this.createFile());
         document.getElementById('saveFile').addEventListener('click', () => this.saveFile());
-        document.getElementById('addAccount').addEventListener('click', () => this.showAddAccountDialog());
-        document.getElementById('addTransaction').addEventListener('click', () => this.showUpdateOrEditTransactionDialog());
-        document.querySelectorAll('.cancel-button').forEach(this.handleCancelButtonClick);
     }
 
     handleCancelButtonClick(button) {
@@ -27,7 +24,7 @@ class UIManager {
             const data = await this.fileManager.openFile();
             this.financeDataManager.data = data;
             this.financeDataManager.updateTotalBalance();
-            
+
             // Set currentYearMonth to the last available month
             const transactionsByMonth = this.financeDataManager.getTransactionsByMonth();
             const months = Object.keys(transactionsByMonth).sort();
@@ -48,7 +45,7 @@ class UIManager {
             this.toggleSpinner();
             const data = await this.fileManager.createFile();
             this.financeDataManager.data = data;
-            
+
             // Set currentYearMonth to the last available month (null for new file)
             this.financeDataManager.currentYearMonth = null;
 
@@ -110,7 +107,9 @@ class UIManager {
             </section>
             `;
 
-            this.setupEventListeners();
+            document.getElementById('addAccount').addEventListener('click', () => this.showAddAccountDialog());
+            document.getElementById('addTransaction').addEventListener('click', () => this.showUpdateOrEditTransactionDialog());
+            document.querySelectorAll('.cancel-button').forEach(this.handleCancelButtonClick);
         }
     }
 
