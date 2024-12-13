@@ -122,13 +122,13 @@ class FinanceManager {
         transactionList.innerHTML = '';
 
         if (!this.currentYearMonth) {
-            transactionList.textContent = 'Selecione um mês para visualizar as transações.';
+            transactionList.textContent = 'Select a month to view transactions.';
             return;
         }
 
         const transactions = this.data.transactions.filter(transaction => transaction.date.startsWith(this.currentYearMonth));
         if (transactions.length === 0) {
-            transactionList.textContent = 'Nenhuma transação disponível para o mês selecionado.';
+            transactionList.textContent = 'No transactions available for the selected month.';
             return;
         }
 
@@ -137,8 +137,8 @@ class FinanceManager {
             transactionItem.classList.add('transaction-item');
             transactionItem.innerHTML = `
                 <span>${transaction.date} - ${transaction.description}: R$${transaction.amount.toFixed(2)} (${transaction.account})</span>
-                <button class="edit-transaction" data-index="${index}">Editar</button>
-                <button class="delete-transaction" data-index="${index}">Remover</button>
+                <button class="edit-transaction" data-index="${index}">Edit</button>
+                <button class="delete-transaction" data-index="${index}">Remove</button>
             `;
             transactionList.appendChild(transactionItem);
         });
@@ -206,7 +206,7 @@ class FinanceManager {
 
         const months = Object.keys(transactionsByMonth);
         if (months.length === 0) {
-            monthlySummary.textContent = 'Nenhum dado disponível.';
+            monthlySummary.textContent = 'No data available.';
             return;
         }
 
@@ -239,9 +239,9 @@ class FinanceManager {
         const summaryDetails = document.createElement('div');
         summaryDetails.classList.add('summary-details');
         summaryDetails.innerHTML = `
-            <p>Receitas: R$${summary.income.toFixed(2)}</p>
-            <p>Despesas: R$${summary.expense.toFixed(2)}</p>
-            <p>Saldo Final: R$${(summary.income + summary.expense).toFixed(2)}</p>
+            <p>Income: R$${summary.income.toFixed(2)}</p>
+            <p>Expenses: R$${summary.expense.toFixed(2)}</p>
+            <p>Final Balance: R$${(summary.income + summary.expense).toFixed(2)}</p>
         `;
         monthlySummary.appendChild(summaryDetails);
     }
@@ -254,10 +254,10 @@ class FinanceManager {
             const initialBalance = parseFloat(dialog.querySelector('#initialBalance').value);
             if (accountName && !isNaN(initialBalance)) {
                 this.data.accounts.push({ name: accountName, balance: initialBalance });
-                // Adiciona transação com o saldo inicial
+                // Add transaction with initial balance
                 const today = new Date().toISOString().split('T')[0];
                 this.data.transactions.push({
-                    description: `Saldo inicial para ${accountName}`,
+                    description: `Initial balance for ${accountName}`,
                     amount: initialBalance,
                     date: today,
                     account: accountName
