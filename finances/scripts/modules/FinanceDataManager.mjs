@@ -23,13 +23,19 @@ class FinanceDataManager {
     }
 
     getTransactionsByMonth() {
-        return this.data.transactions.reduce((acc, transaction) => {
+        const transactionsByMonth = this.data.transactions.reduce((acc, transaction) => {
             const month = transaction.date.slice(0, 7);
             if (!acc[month]) acc[month] = { income: 0, expense: 0, transactions: [] };
             if (transaction.amount > 0) acc[month].income += transaction.amount;
             else acc[month].expense += transaction.amount;
             acc[month].transactions.push(transaction);
             return acc;
+        }, {});
+
+        // Sort the months
+        return Object.keys(transactionsByMonth).sort().reduce((sortedAcc, month) => {
+            sortedAcc[month] = transactionsByMonth[month];
+            return sortedAcc;
         }, {});
     }
 }

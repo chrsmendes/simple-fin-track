@@ -27,6 +27,13 @@ class UIManager {
             const data = await this.fileManager.openFile();
             this.financeDataManager.data = data;
             this.financeDataManager.updateTotalBalance();
+            
+            // Set currentYearMonth to the last available month
+            const transactionsByMonth = this.financeDataManager.getTransactionsByMonth();
+            const months = Object.keys(transactionsByMonth).sort();
+            const lastMonth = months[months.length - 1] || null;
+            this.financeDataManager.currentYearMonth = lastMonth;
+
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
         } catch (error) {
@@ -41,6 +48,10 @@ class UIManager {
             this.toggleSpinner();
             const data = await this.fileManager.createFile();
             this.financeDataManager.data = data;
+            
+            // Set currentYearMonth to the last available month (null for new file)
+            this.financeDataManager.currentYearMonth = null;
+
             await this.saveFile();
             this.updateUI();
             document.getElementById('saveFile').disabled = false;
@@ -98,6 +109,8 @@ class UIManager {
                 <div class="monthly-summary"></div>
             </section>
             `;
+
+            this.setupEventListeners();
         }
     }
 
