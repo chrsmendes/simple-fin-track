@@ -254,6 +254,14 @@ class FinanceManager {
             const initialBalance = parseFloat(dialog.querySelector('#initialBalance').value);
             if (accountName && !isNaN(initialBalance)) {
                 this.data.accounts.push({ name: accountName, balance: initialBalance });
+                // Adiciona transação com o saldo inicial
+                const today = new Date().toISOString().split('T')[0];
+                this.data.transactions.push({
+                    description: `Saldo inicial para ${accountName}`,
+                    amount: initialBalance,
+                    date: today,
+                    account: accountName
+                });
                 this.updateUI();
                 dialog.classList.remove('active');
                 this.saveToLocalStorage();
