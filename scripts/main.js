@@ -166,8 +166,11 @@ class FinanceManager {
             const date = dialog.querySelector('#transactionDate').value;
             const accountName = dialog.querySelector('#transactionAccount').value;
             if (description && !isNaN(amount) && date && accountName) {
+                const oldAmount = this.data.transactions[index].amount;
+                const oldAccount = this.data.transactions[index].account;
                 this.data.transactions[index] = { description, amount, date, account: accountName };
-                this.updateAccountBalance(accountName, amount);
+                this.updateAccountBalance(oldAccount, -oldAmount); // Revert old transaction amount
+                this.updateAccountBalance(accountName, amount); // Apply new transaction amount
                 this.updateUI();
                 dialog.classList.remove('active');
                 this.saveToLocalStorage();
