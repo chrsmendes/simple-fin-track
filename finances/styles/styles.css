@@ -187,3 +187,9 @@ main {
 .transaction-item.expense {
     color: var(--expense-color);
 }
+
+.temporary-p {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    font-style: italic;
+}

@@ -60,6 +60,8 @@ class UIManager {
     }
 
     updateUI() {
+        this.generateUI();
+
         // Update accounts UI
         const accountList = document.querySelector('.account-list');
         accountList.innerHTML = '';
@@ -74,6 +76,29 @@ class UIManager {
 
         // Update monthly summary UI
         this.updateMonthlySummaryUI();
+    }
+
+    generateUI() {
+        if (document.querySelector('main').children.length == 1) {
+            document.querySelector('main').innerHTML = `
+            <section id="accounts" class="section">
+                <h2>Accounts</h2>
+                <div class="account-list"></div>
+                <button id="addAccount">+ New Account</button>
+            </section>
+
+            <section id="transactions" class="section">
+                <h2>Transactions</h2>
+                <div class="transaction-list"></div>
+                <button id="addTransaction">+ New Transaction</button>
+            </section>
+
+            <section id="monthly-view" class="section">
+                <h2>Monthly View</h2>
+                <div class="monthly-summary"></div>
+            </section>
+            `;
+        }
     }
 
     updateTransactionsUI() {
