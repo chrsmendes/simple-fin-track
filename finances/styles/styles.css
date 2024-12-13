@@ -193,3 +193,10 @@ main {
     color: var(--secondary-color);
     font-style: italic;
 }
+
+.unsupported-message {
+    font-size: 1.2rem;
+    color: var(--expense-color);
+    text-align: center;
+    margin-top: 2rem;
+}

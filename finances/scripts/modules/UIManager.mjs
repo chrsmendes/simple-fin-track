@@ -3,6 +3,7 @@ class UIManager {
         this.financeDataManager = financeDataManager;
         this.fileManager = fileManager;
         this.setupEventListeners();
+        this.checkFileSystemAccess();
     }
 
     setupEventListeners() {
@@ -294,6 +295,18 @@ class UIManager {
         this.updateUI();
         dialog.classList.remove('active');
         this.saveFile();
+    }
+
+    checkFileSystemAccess() {
+        if (!this.fileManager.isFileSystemAccessSupported()) {
+            // Disable file buttons
+            document.getElementById('openFile').disabled = true;
+            document.getElementById('createFile').disabled = true;
+            document.getElementById('saveFile').disabled = true;
+            // Display message
+            const mainSection = document.querySelector('main');
+            mainSection.innerHTML = '<section class="section"><p class="unsupported-message">This application does not work on your device yet.</p></section>';
+        }
     }
 }
 

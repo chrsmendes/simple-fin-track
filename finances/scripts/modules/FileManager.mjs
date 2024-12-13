@@ -3,6 +3,10 @@ class FileManager {
         this.fileHandle = null;
     }
 
+    isFileSystemAccessSupported() {
+        return 'showOpenFilePicker' in window;
+    }
+
     async openFile() {
         try {
             const [fileHandle] = await window.showOpenFilePicker({
