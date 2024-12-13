@@ -24,10 +24,10 @@ class FinanceManager {
             const [fileHandle] = await window.showOpenFilePicker({
                 types: [{
                     description: 'JSON Files',
-                    accept: {'application/json': ['.json']},
+                    accept: { 'application/json': ['.json'] },
                 }],
             });
-            
+
             this.fileHandle = fileHandle;
             const file = await fileHandle.getFile();
             const contents = await file.text();
@@ -49,10 +49,10 @@ class FinanceManager {
             const handle = await window.showSaveFilePicker({
                 types: [{
                     description: 'JSON Files',
-                    accept: {'application/json': ['.json']},
+                    accept: { 'application/json': ['.json'] },
                 }],
             });
-            
+
             this.fileHandle = handle;
             this.data = {
                 accounts: [],
@@ -177,9 +177,12 @@ class FinanceManager {
                 this.saveFile();
             }
         };
-        dialog.querySelector('.cancel-button').onclick = () => {
-            dialog.classList.remove('active');
-        };
+        const cancelButtons = dialog.querySelectorAll('.cancel-button');
+        cancelButtons.forEach(button => {
+            button.onclick = () => {
+                dialog.classList.remove('active');
+            };
+        });
     }
 
     removeTransaction(index) {
@@ -268,9 +271,12 @@ class FinanceManager {
                 this.saveFile();
             }
         };
-        dialog.querySelector('.cancel-button').onclick = () => {
-            dialog.classList.remove('active');
-        };
+        const cancelButtons = dialog.querySelectorAll('.cancel-button');
+        cancelButtons.forEach(button => {
+            button.onclick = () => {
+                dialog.classList.remove('active');
+            };
+        });
     }
 
     showAddTransactionDialog() {
@@ -299,9 +305,12 @@ class FinanceManager {
                 this.saveFile();
             }
         };
-        dialog.querySelector('.cancel-button').onclick = () => {
-            dialog.classList.remove('active');
-        };
+        const cancelButtons = dialog.querySelectorAll('.cancel-button');
+        cancelButtons.forEach(button => {
+            button.onclick = () => {
+                dialog.classList.remove('active');
+            };
+        });
     }
 
     updateAccountBalance(accountName, amount) {
